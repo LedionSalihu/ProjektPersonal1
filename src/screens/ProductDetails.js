@@ -5,16 +5,19 @@ import {
   StyleSheet,
   Image,
 } from 'react-native';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useContext } from 'react';
 import { Ionicons } from '@expo/vector-icons';
 import { getProductById } from '../Services/api';
 import { productImages } from '../data/ProductImages';
 import { colors } from '../theme/colors';
 import { spacing } from '../theme/spacing';
+import { CartContext } from '../contexts/CartContexts'; // ✅ import CartContext
 
 export default function ProductDetailsScreen({ route }) {
   const { id } = route.params;
   const [product, setProduct] = useState(null);
+
+  const { addToCart } = useContext(CartContext); // ✅ get addToCart function
 
   useEffect(() => {
     getProductById(id).then(setProduct);
@@ -38,8 +41,11 @@ export default function ProductDetailsScreen({ route }) {
       <Text style={styles.desc}>{product.description}</Text>
       <Text style={styles.price}>${product.price}</Text>
 
-      <TouchableOpacity style={styles.button}>
-        <Ionicons name="cart-outline" size={22} color="#000" />
+      <TouchableOpacity
+        style={styles.button}
+        onPress={() => addToCart(product)} // ✅ add to cart
+      >
+        <Ionicons name="cart-outline" size={22} color="#fff" />
         <Text style={styles.buttonText}> Add to Cart</Text>
       </TouchableOpacity>
     </View>
@@ -89,6 +95,6 @@ const styles = StyleSheet.create({
     marginLeft: spacing.s,
     fontWeight: '800',
     fontSize: 16,
-    color: '#000',
+    color: '#fff', // ✅ changed to white for visibility
   },
 });

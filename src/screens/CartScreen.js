@@ -1,61 +1,62 @@
-import { View, Text, FlatList, StyleSheet } from 'react-native';
+import { View, Text, FlatList, TouchableOpacity, StyleSheet } from 'react-native';
 import { useContext } from 'react';
 import { CartContext } from '../contexts/CartContexts';
 import { colors } from '../theme/colors';
 import { spacing } from '../theme/spacing';
+import { Ionicons } from '@expo/vector-icons';
 
 export default function CartScreen() {
-  const { cartItems } = useContext(CartContext);
-
-  if (cartItems.length === 0) {
-    return (
-      <View style={styles.container}>
-        <Text style={styles.empty}>Your cart is empty 🛒</Text>
-      </View>
-    );
-  }
+  const { cartItems, removeFromCart, clearCart } = useContext(CartContext);
 
   return (
     <View style={styles.container}>
-      <FlatList
-        data={cartItems}
-        keyExtractor={(item, index) => index.toString()}
-        renderItem={({ item }) => (
-          <View style={styles.item}>
-            <Text style={styles.title}>{item.title}</Text>
-            <Text style={styles.price}>${item.price}</Text>
-          </View>
-        )}
-      />
+      {cartItems.length === 0 ? (
+        <Text style={styles.empty}>Your cart is empty 😔</Text>
+      ) : (
+        <>
+          <FlatList
+            data={cartItems}
+            keyExtractor={(item) => item.id.toString()}
+            renderItem={({ item }) => (
+              <View style={styles.item}>
+                <Text style={styles.title}>{item.title}</Text>
+                <Text style={styles.price}>${item.price}</Text>
+                <TouchableOpacity onPress={() => removeFromCart(item.id)}>
+                  <Ionicons name="trash-outline" size={24} color="red" />
+                </TouchableOpacity>
+              </View>
+            )}
+          />
+
+          <TouchableOpacity style={styles.clearButton} onPress={clearCart}>
+            <Text style={styles.clearText}>Clear Cart</Text>
+          </TouchableOpacity>
+        </>
+      )}
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: spacing.l,
-    backgroundColor: colors.background,
-  },
-  empty: {
-    fontSize: 16,
-    textAlign: 'center',
-    marginTop: 50,
-    color: colors.muted,
-  },
+  container: { flex: 1, padding: spacing.l, backgroundColor: colors.background },
+  empty: { textAlign: 'center', marginTop: spacing.xl, fontSize: 16, color: colors.muted },
   item: {
-    backgroundColor: '#fff',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    backgroundColor: colors.card,
     padding: spacing.m,
-    borderRadius: 15,
-    marginBottom: spacing.m,
+    borderRadius: 14,
+    marginBottom: spacing.s,
   },
-  title: {
-    fontWeight: '700',
-    fontSize: 15,
+  title: { fontSize: 16, fontWeight: '700', color: colors.text },
+  price: { fontSize: 15, color: colors.muted },
+  clearButton: {
+    marginTop: spacing.l,
+    backgroundColor: colors.primary,
+    padding: spacing.m,
+    borderRadius: 30,
+    alignItems: 'center',
   },
-  price: {
-    fontWeight: '900',
-    color: colors.primary,
-    marginTop: 5,
-  },
+  clearText: { color: '#fff', fontWeight: '800' },
 });
